@@ -15,34 +15,34 @@ Note: Some questions require you to take screenshots. In that case, please join 
 1. What happens when Raft starts? Explain the process of electing a leader in the first
 term.
 
-Ans: 
+Ans: When Raft starts, all servers begin in the follower state. Each server sets a randomized election timeout. If a follower does not receive any communication from a leader within this timeout, it transitions to the candidate state and initiates an election by incrementing its term and sending RequestVote messages to other servers. The other servers respond with their votes. If a candidate receives votes from a majority of the servers, it becomes the leader for that term. The leader then starts sending heartbeat messages (AppendEntries) to maintain its authority and prevent new elections.
 
 2. Perform one request on the leader, wait until the leader is committed by all servers. Pause the simulation.
 Then perform a new request on the leader. Take a screenshot, stop the leader and then resume the simulation.
 Once, there is a new leader, perform a new request and then resume the previous leader. Once, this new request is committed by all servers, pause the simulation and take a screenshot. Explain what happened?
 
-Ans: 
+Ans: The first request on the leader was successfully processed and committed by all servers, ensuring data consistency across the cluster. When the first leader was paused, a new leader election took place among the remaining servers. The new leader then processed the second request. Upon resuming the previous leader, it recognized the new leader's authority and synchronized its state accordingly. The final request was committed by all servers, demonstrating Raft's ability to maintain consistency and handle leader changes seamlessly.
 
 3. Using the same visualization, stop the current leader and two additional servers. After a few increments, pause the simulation and take a screenshot. Then resume all servers and restart the simulation. After the leader election, pause the simulation and take a screenshot. How do you explain the behavior of the system during the above exercise?
 
-Ans: 
+Ans: Because a majority of servers (3 of 5) were stopped, the remaining servers could not elect a new leader. As a result, the system was unable to process any requests during this period. As soon as all servers were resumed, a new leader election took place among the active 5 servers, allowing the system to regain its functionality and process requests again. This exercise highlights Raft's reliance on majority consensus for leader election and operation.
 
 # Task 2
 
 1. Which server is the leader? Can there be multiple leaders? Justify your answer using the statuses from the different servers.
-Ans: 
+Ans: After starting all three servers only one node is the leader in the admin/status endpoint. In Raft, there cannot be multiple leaders at the same time because the protocol is designed to ensure that only one server can act as the leader in a given term. This is achieved through the election process, where a candidate must receive votes from a majority of the servers to become the leader. If multiple servers were to claim leadership simultaneously, it would lead to inconsistencies and conflicts in the log replication process. The statuses from the different servers confirm that only one server holds the leader role while the others are followers.
 
 2. Perform a PUT operation for the key "a" on the leader. Check the status of the different nodes. What changes have occurred and why (if any)?
 
-Ans:
+Ans: The leader returns 204 No Content indicating that the PUT operation was successful. When checking the status of the different nodes, the leader's log will show the new entry for key "a" with its corresponding value, while the follower nodes will have replicated this entry in their logs as well. The term and commit index may also be updated to reflect the new state of the log. These changes occur because Raft ensures that log entries are replicated across all servers to maintain consistency.
 
 3. Perform an APPEND operation for the key "a" on the leader. Check the status of the different nodes. What changes have occurred and why (if any)?
 
-Ans: 
+Ans: The leader returns 204 No Content indicating that the APPEND operation was successful. When checking the status of the different nodes, the leader's log will show the updated entry for key "a" with the appended value, while the follower nodes will have replicated this updated entry in their logs as well. The term and commit index may also be updated to reflect the new state of the log. These changes occur because Raft ensures that log entries are replicated across all servers to maintain consistency. This because APPEND is also a raft command
 
 4. Perform a GET operation for the key "a" on the leader. Check the status of the different nodes. What changes have occured and why (if any)?
 
-Ans:
+Ans: There were no changes in the status of the different nodes after performing a GET operation for the key "a" on the leader. The GET operation is a read-only operation and does not modify the state of the log or the data stored in the servers. Therefore, the term, commit index, and log entries remain unchanged across all nodes. The leader simply retrieves the value associated with key "a" without affecting the overall state of the Raft cluster.
 
 
 
