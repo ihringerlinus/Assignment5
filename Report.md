@@ -145,3 +145,7 @@ Ans:
     * Send conflicting log entries to different followers.
     * Corrupt the log.
     * Raft lacks mechanisms like cryptographic signatures or Byzantine fault-tolerant consensus (like PBFT) to detect and reject such malicious behavior.
+
+
+# Use of AI
+We used Gemini especially for Task 3 and 4 to get the right commands we needed, and solve any problems we encountered, e.g. forgetting to start the docker deamon.
